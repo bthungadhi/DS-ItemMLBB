@@ -1,7 +1,14 @@
+(Tidak sempat konsul, maafkan :D)
+
 Observation Questions
 1.what is the root node in the program : rootnya adalah item" utama seperti Blade armor,immortality,DLL
 2.Which nodes are leaf nodes?: bagian leafnya adalah mentahan" dari item utama seperti ares belt, expert gloves DLL
 3.Why is children stored as a List<ItemNode> instead of a single variable?: kalau menggunakan single variabel maka mentahan" yang ada pada item utama tidak akan jadi karena mentahan pada item utama itu banyak.
 4.What is the difference between a linear structure and a tree structure in this example?: kalau linear, dia tidak akan muncul percabangan mentahan itemnya, yang muncul hanya garis lurus seperti history (yang ada di kodingan saya) sedangkan tree itu menunjukkan bahwa item utamanya memiliki item mentahan
 5.How does recursion help when working with trees? rekursi membuat kita tidak mengulang loopingan berlapis secara manual di setiap level yang berbeda
-6.What path is printed when searching for Corrosion Scythe?
+6.What path is printed when searching for Corrosion Scythe? yang keluar adalah item "Nama item" tidak akan keluar karena tidak ada variabelnya (saya buat item khusus tank)
+
+Refleksi
+Tree jauh lebih cocok digunakan dibandingkan array untuk merepresentasikan kemungkinan pembelian item karena tree bisa menggambarkan hubungan hierarki secara alami. Dalam MLBB, setiap item jadi membutuhkan beberapa bahan, dan bahan tersebut bisa punya sub-bahan lagi — hubungan seperti ini tidak bisa direpresentasikan dengan baik menggunakan array yang sifatnya linear dan hanya bisa menyimpan data secara berurutan satu arah. Dengan tree, setiap node bisa punya banyak cabang sekaligus, sehingga satu item jadi seperti Guardian Helmet bisa langsung terhubung ke tiga Ares Belt, dan setiap Ares Belt bisa terhubung ke bahan pembuatnya. Struktur ini jauh lebih intuitif dan mudah ditelusuri dibandingkan menyimpan semua relasi tersebut dalam sebuah array datar.
+
+Bagian dari lab ini yang paling membantu saya memahami rekursi adalah saat mengimplementasikan method printTree() dan printAllBuildPaths(). Awalnya saya bingung bagaimana sebuah method bisa memanggil dirinya sendiri, namun setelah melihat bagaimana method tersebut turun dari root ke setiap cabang secara otomatis tanpa perlu menulis loop berlapis, saya mulai mengerti logikanya. Tantangan terbesar yang saya hadapi adalah saat melacak proses backtracking — yaitu bagaimana program menghapus node terakhir dari catatan jalur setelah selesai menelusuri satu cabang, lalu mundur untuk mencoba cabang lain. Konsep ini membutuhkan waktu untuk dipahami karena alur eksekusinya tidak sesederhana kode yang berjalan lurus dari atas ke bawah.
