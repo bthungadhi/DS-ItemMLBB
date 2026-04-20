@@ -20,7 +20,15 @@ public class TreeMLBBTutorial {
         }
     }
 
+    // PART B — Print Tree
+    static void printTree(ItemNode node, int level) {
+        if (node == null) return;
+        String indent = "  ".repeat(level);
+        System.out.println(indent + "- " + node.name);
+        for (ItemNode child : node.children) printTree(child, level + 1);
+    }
 
+    // PART C — Print All Build Paths
     static void printAllBuildPaths(ItemNode node, List<String> path) {
         if (node == null) return;
         path.add(node.name);
@@ -32,6 +40,7 @@ public class TreeMLBBTutorial {
         path.remove(path.size() - 1);
     }
 
+    // PART D — Tree Operations
     static int countNodes(ItemNode node) {
         if (node == null) return 0;
         int total = 1;
@@ -56,6 +65,7 @@ public class TreeMLBBTutorial {
         return 1 + maxChildHeight;
     }
 
+    // PART E — Find Path & Find Node
     static boolean findPath(ItemNode node, String target, List<String> path) {
         if (node == null) return false;
         path.add(node.name);
@@ -77,6 +87,48 @@ public class TreeMLBBTutorial {
         return null;
     }
 
+    // ════════════════════════════════════════════════════
+    // TASK 2 — countItemOccurrences()
+    // Menghitung berapa kali sebuah item muncul di seluruh pohon
+    // Berguna karena satu bahan (misal Vitality Crystal) bisa dipakai banyak item
+    // ════════════════════════════════════════════════════
+    static int countItemOccurrences(ItemNode node, String target) {
+        if (node == null) return 0; // Node kosong, tidak ada yang dihitung
+
+        // Kalau nama node ini cocok dengan target, hitung 1
+        int count = node.name.equalsIgnoreCase(target) ? 1 : 0;
+
+        // Tambahkan hasil hitungan dari semua anak (rekursi)
+        for (ItemNode child : node.children) {
+            count += countItemOccurrences(child, target);
+        }
+        return count;
+    }
+
+    // ════════════════════════════════════════════════════
+    // TASK 3 — printPathsEndingWith()
+    // Mencetak hanya jalur yang berakhir dengan item tertentu (misal "Immortality")
+    // ════════════════════════════════════════════════════
+    // TASK 3 — printPathsEndingWith()
+    static void printPathsEndingWith(ItemNode node, String target, List<String> path) {
+        if (node == null) return;
+
+        path.add(node.name); // Catat node saat ini ke jalur
+
+        // Cek apakah nama node saat ini cocok dengan target
+        if (node.name.equalsIgnoreCase(target)) {
+            // Kalau cocok, cetak jalur dari root sampai node ini beserta semua sub-bahannya
+            printAllBuildPaths(node, new java.util.ArrayList<>(path.subList(0, path.size() - 1)));
+        } else {
+            // Belum ketemu, terus ke anak-anak (rekursi)
+            for (ItemNode child : node.children) {
+                printPathsEndingWith(child, target, path);
+            }
+        }
+
+        path.remove(path.size() - 1); // Backtracking
+    }
+
     public static void main(String[] args) {
 
         // ════════════════════════════════════════
@@ -84,41 +136,45 @@ public class TreeMLBBTutorial {
         // ════════════════════════════════════════
         ItemNode root = new ItemNode("Start Build");
 
-        ItemNode fleetingtime = new ItemNode("Fleeting time");
+        // TASK 1 — Branch baru: Fleeting Time (item non-tank sebagai cabang berbeda)
+        // Bahan: Hero's Ring x2 + Expert Gloves
+        ItemNode fleetingtime = new ItemNode("Fleeting Time");
         fleetingtime.addChild(new ItemNode("Hero's Ring"));
         fleetingtime.addChild(new ItemNode("Hero's Ring"));
         fleetingtime.addChild(new ItemNode("Expert Gloves"));
-        // Guardian Helmet: Ares Belt x2 + Dreadnaught Armor (Leather Jerkin x2)
+
+        // Guardian Helmet — Bahan: Ares Belt x3
         ItemNode guardianHelmet = new ItemNode("Guardian Helmet");
         guardianHelmet.addChild(new ItemNode("Ares Belt"));
         guardianHelmet.addChild(new ItemNode("Ares Belt"));
         guardianHelmet.addChild(new ItemNode("Ares Belt"));
-        
-        ItemNode chasitepauldron = new ItemNode("Chasite Pauldron");
-        ItemNode dread2 = new ItemNode("Steel Legpants");
-        dread2.addChild(new ItemNode("Leather Jerkin"));
-        chasitepauldron.addChild(dread2);
-        ItemNode dread3 = new ItemNode("Ares belt");
-        dread3.addChild(new ItemNode("Vitality Crystal"));
-        chasitepauldron.addChild(dread3);
 
-        // Immortality: Ares Belt + Leather Jerkin + Vitality Crystal
+        // Chastise Pauldron — Bahan: Steel Legpants + Ares Belt
+        ItemNode chasitepauldron = new ItemNode("Chastise Pauldron");
+        ItemNode steelLegpants = new ItemNode("Steel Legpants");
+        steelLegpants.addChild(new ItemNode("Leather Jerkin"));
+        chasitepauldron.addChild(steelLegpants);
+        ItemNode aresBeltCP = new ItemNode("Ares Belt");
+        aresBeltCP.addChild(new ItemNode("Vitality Crystal"));
+        chasitepauldron.addChild(aresBeltCP);
+
+        // Immortality — Bahan: Ares Belt (dari Vitality Crystal) + Leather Jerkin + Vitality Crystal
         ItemNode immortality = new ItemNode("Immortality");
-        ItemNode dread1 = new ItemNode("Ares belt");
-        dread1.addChild(new ItemNode("Vitality crystal"));
-        immortality.addChild(dread1);
+        ItemNode aresBeltIM = new ItemNode("Ares Belt");
+        aresBeltIM.addChild(new ItemNode("Vitality Crystal"));
+        immortality.addChild(aresBeltIM);
         immortality.addChild(new ItemNode("Leather Jerkin"));
         immortality.addChild(new ItemNode("Vitality Crystal"));
 
-        // Dominance Ice: Ares Belt + Magic Resist Cloak + Steel Legplates
+        // Dominance Ice — Bahan: Ares Belt (dari Vitality Crystal) + Magic Resist Cloak + Steel Legplates
         ItemNode dominanceIce = new ItemNode("Dominance Ice");
-        ItemNode dread4 = new ItemNode("Ares Belt");
-        dread4.addChild(new ItemNode("Vitality Crystal"));
-        dominanceIce.addChild(dread4);
+        ItemNode aresBeltDI = new ItemNode("Ares Belt");
+        aresBeltDI.addChild(new ItemNode("Vitality Crystal"));
+        dominanceIce.addChild(aresBeltDI);
         dominanceIce.addChild(new ItemNode("Magic Resist Cloak"));
         dominanceIce.addChild(new ItemNode("Steel Legplates"));
 
-        // Cursed Helmet: Vitality Crystal + Molten Essence (Vitality Crystal) + Magic Resist Cloak
+        // Cursed Helmet — Bahan: Vitality Crystal + Molten Essence + Magic Resist Cloak
         ItemNode cursedHelmet = new ItemNode("Cursed Helmet");
         cursedHelmet.addChild(new ItemNode("Vitality Crystal"));
         ItemNode molten1 = new ItemNode("Molten Essence");
@@ -126,13 +182,13 @@ public class TreeMLBBTutorial {
         cursedHelmet.addChild(molten1);
         cursedHelmet.addChild(new ItemNode("Magic Resist Cloak"));
 
-        // Thunder Belt: Ares Belt + Leather Jerkin + Magic Resist Cloak
+        // Thunder Belt — Bahan: Ares Belt + Leather Jerkin + Magic Resist Cloak
         ItemNode thunderBelt = new ItemNode("Thunder Belt");
         thunderBelt.addChild(new ItemNode("Ares Belt"));
         thunderBelt.addChild(new ItemNode("Leather Jerkin"));
         thunderBelt.addChild(new ItemNode("Magic Resist Cloak"));
 
-        // Athena's Shield: Molten Essence (Vitality Crystal) + Vitality Crystal + Magic Resist Cloak
+        // Athena's Shield — Bahan: Molten Essence + Vitality Crystal + Magic Resist Cloak
         ItemNode athenasShield = new ItemNode("Athena's Shield");
         ItemNode molten2 = new ItemNode("Molten Essence");
         molten2.addChild(new ItemNode("Vitality Crystal"));
@@ -140,21 +196,40 @@ public class TreeMLBBTutorial {
         athenasShield.addChild(new ItemNode("Vitality Crystal"));
         athenasShield.addChild(new ItemNode("Magic Resist Cloak"));
 
-        // Antique Cuirass: Vitality Crystal + Dreadnaught Armor (Leather Jerkin x2) + Steel Legplates
+        // Antique Cuirass — Bahan: Vitality Crystal + Dreadnaught Armor + Steel Legplates
         ItemNode antiqueCuirass = new ItemNode("Antique Cuirass");
         antiqueCuirass.addChild(new ItemNode("Vitality Crystal"));
-        ItemNode dread2 = new ItemNode("Dreadnaught Armor");
-        dread2.addChild(new ItemNode("Leather Jerkin"));
-        dread2.addChild(new ItemNode("Leather Jerkin"));
-        antiqueCuirass.addChild(dread2);
+        ItemNode dreadAntique = new ItemNode("Dreadnaught Armor");
+        dreadAntique.addChild(new ItemNode("Leather Jerkin"));
+        dreadAntique.addChild(new ItemNode("Leather Jerkin"));
+        antiqueCuirass.addChild(dreadAntique);
         antiqueCuirass.addChild(new ItemNode("Steel Legplates"));
 
-        // Oracle: Ares Belt + Healing Necklace + Magic Resist Cloak
+        // Oracle — Bahan: Ares Belt + Healing Necklace + Magic Resist Cloak
         ItemNode oracle = new ItemNode("Oracle");
         oracle.addChild(new ItemNode("Ares Belt"));
         oracle.addChild(new ItemNode("Healing Necklace"));
         oracle.addChild(new ItemNode("Magic Resist Cloak"));
-        
+
+        // TASK 5 — Tambah satu level lebih dalam pada Dreadnaught Armor
+        // Sebelumnya: Dreadnaught Armor -> Leather Jerkin (3 level)
+        // Sekarang:   Dreadnaught Armor -> Leather Jerkin -> Raw Hide (4 level -> jadi 5 level total)
+        // Ini menambah tinggi pohon dari 4 menjadi 5
+        ItemNode dreadnaught5 = new ItemNode("Dreadnaught Armor");
+        ItemNode leatherJerkinDeep1 = new ItemNode("Leather Jerkin");
+        leatherJerkinDeep1.addChild(new ItemNode("Raw Hide")); // Level baru (sub-bahan paling dasar)
+        ItemNode leatherJerkinDeep2 = new ItemNode("Leather Jerkin");
+        leatherJerkinDeep2.addChild(new ItemNode("Raw Hide")); // Level baru
+        dreadnaught5.addChild(leatherJerkinDeep1);
+        dreadnaught5.addChild(leatherJerkinDeep2);
+
+        // Blade Armor — item dengan Dreadnaught Armor yang sudah ditambah levelnya
+        // Ini membuktikan tinggi pohon bertambah saat ada level baru
+        ItemNode bladeArmor = new ItemNode("Blade Armor");
+        bladeArmor.addChild(dreadnaught5);
+        bladeArmor.addChild(new ItemNode("Steel Legplates"));
+
+        // Sambungkan semua item ke root
         root.addChild(fleetingtime);
         root.addChild(guardianHelmet);
         root.addChild(chasitepauldron);
@@ -165,6 +240,7 @@ public class TreeMLBBTutorial {
         root.addChild(athenasShield);
         root.addChild(antiqueCuirass);
         root.addChild(oracle);
+        root.addChild(bladeArmor); // TASK 5: item baru dengan level tambahan
 
         // ════════════════════════════════════════
         // OUTPUT TREE
@@ -183,6 +259,33 @@ public class TreeMLBBTutorial {
         System.out.println("Total Node   : " + countNodes(root));
         System.out.println("Total Daun   : " + countLeaves(root));
         System.out.println("Tinggi Pohon : " + height(root));
+
+        // ════════════════════════════════════════
+        // TASK 2 — Hitung kemunculan item tertentu
+        // ════════════════════════════════════════
+        System.out.println();
+        System.out.println("=== TASK 2: JUMLAH KEMUNCULAN ITEM ===");
+        String[] itemDicek = {"Vitality Crystal", "Ares Belt", "Leather Jerkin", "Magic Resist Cloak"};
+        for (String item : itemDicek) {
+            int jumlah = countItemOccurrences(root, item);
+            System.out.println("\"" + item + "\" muncul sebanyak: " + jumlah + " kali");
+        }
+
+        // ════════════════════════════════════════
+        // TASK 3 — Cetak jalur yang berakhir dengan "Immortality"
+        // ════════════════════════════════════════
+        System.out.println();
+        System.out.println("=== TASK 3: JALUR YANG BERAKHIR DENGAN 'Immortality' ===");
+        printPathsEndingWith(root, "Immortality", new ArrayList<>());
+
+        // ════════════════════════════════════════
+        // TASK 5 — Observasi tinggi pohon sebelum & sesudah level baru
+        // ════════════════════════════════════════
+        System.out.println();
+        System.out.println("=== TASK 5: OBSERVASI TINGGI POHON ===");
+        System.out.println("Tinggi pohon saat ini    : " + height(root));
+        System.out.println("(Blade Armor menambah level: Blade Armor -> Dreadnaught Armor -> Leather Jerkin -> Raw Hide)");
+        System.out.println("Tinggi bertambah karena ada sub-bahan baru 'Raw Hide' di level terdalam");
 
         // ════════════════════════════════════════
         // SCANNER — HISTORY BUILD (maks 6 item)
@@ -213,12 +316,11 @@ public class TreeMLBBTutorial {
         }
 
         System.out.println();
+        // TASK 4 — Scanner untuk input nama item target pencarian (sudah ada sejak awal)
         System.out.println("Perintah: 'history' | 'clear' | 'exit'");
         System.out.println("Maksimal item dalam build: 6 slot");
 
-        // ArrayList history build dengan batas 6
         ArrayList<String> historyBuild = new ArrayList<>(6);
-
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
@@ -259,7 +361,6 @@ public class TreeMLBBTutorial {
                 System.out.println("History build berhasil dihapus!");
 
             } else {
-                // Cek batas 6 slot
                 if (historyBuild.size() >= 6) {
                     System.out.println("Build sudah penuh! Maksimal 6 item. Ketik 'clear' untuk reset.");
                     continue;
@@ -289,10 +390,5 @@ public class TreeMLBBTutorial {
         }
 
         scanner.close();
-    }
-
-    private static void printTree(ItemNode root, int i) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'printTree'");
     }
 }
